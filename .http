@@ -1,0 +1,18 @@
+###
+POST http://localhost:3000/
+Content-Type: application/json
+
+{
+  "id": 3,
+  "name": "Kiem",
+  "username": "string",
+  "email": "string",
+  "birthday": "2022-07-18T07:21:30.000Z",
+  "password": "string"
+}
+
+###
+DELETE http://localhost:3000/3
+
+###
+GET http://localhost:3000/
