@@ -3,9 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
 
 import { User } from './user.entity';
-import { hashPassword } from '../../helpers';
+import { hashPassword, comparePassword, createJwtToken } from '../../helpers';
 import { IUserSend } from './user.interface';
-import { RegisterDto } from './dto';
+import { RegisterDto } from './user.dto';
 
 @Injectable()
 export class UserService {
@@ -50,6 +50,32 @@ export class UserService {
       }
 
       return false;
+    } catch (error: unknown) {
+      throw new Error(error as string);
+    }
+  }
+
+  async login(
+    email: string,
+    password: string,
+  ): Promise<string | null | boolean> {
+    try {
+      const user: User = await this.usersRepository.findOneBy({
+        email,
+      });
+
+      if (!user) {
+        return null;
+      }
+
+      const isCheckPassword = await comparePassword(password, user.password);
+
+      if (!isCheckPassword) {
+        return false;
+      }
+
+      const userMap = this.mappingFromUserRepository(user);
+      return createJwtToken(userMap);
     } catch (error: unknown) {
       throw new Error(error as string);
     }
