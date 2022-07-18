@@ -1,4 +1,4 @@
-export class IUserSend {
+export interface IUserSend {
   name: string;
   email: string;
   birthday: Date;

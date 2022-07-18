@@ -5,7 +5,7 @@ import { Repository, UpdateResult } from 'typeorm';
 import { User } from './user.entity';
 import { hashPassword, comparePassword, createJwtToken } from '../../helpers';
 import { IUserSend } from './user.interface';
-import { RegisterDto } from './user.dto';
+import { RegisterDto, UpdateDto } from './user.dto';
 
 @Injectable()
 export class UserService {
@@ -81,8 +81,12 @@ export class UserService {
     }
   }
 
-  update(id: number, user: User): Promise<UpdateResult> {
-    return this.usersRepository.update(id, user);
+  update(id: number, user: UpdateDto): Promise<UpdateResult> {
+    try {
+      return this.usersRepository.update(id, user);
+    } catch (error: unknown) {
+      throw new Error(error as string);
+    }
   }
 
   async remove(id: number): Promise<number> {
