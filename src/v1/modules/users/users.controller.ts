@@ -4,6 +4,7 @@ import {
   Post,
   Param,
   Body,
+  Put,
   Delete,
   Res,
   HttpStatus,
@@ -12,7 +13,7 @@ import { Response } from 'express';
 
 import { UserService } from './user.service';
 import { User } from './user.entity';
-import { RegisterDto, DeleteUserDto, LoginDto } from './user.dto';
+import { RegisterDto, DeleteUserDto, LoginDto, UpdateDto } from './user.dto';
 import { IUserSend } from './user.interface';
 
 @Controller()
@@ -77,6 +78,24 @@ export class UserController {
       }
 
       res.status(HttpStatus.OK).send(jwt);
+    } catch (error: unknown) {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error);
+      throw new Error(error as string);
+    }
+  }
+
+  @Put('/:id')
+  async updateUser(
+    @Body() conditionUpdate: UpdateDto,
+    @Res() res: Response,
+    @Param() id: string,
+  ): Promise<any> {
+    try {
+      if (!id || !conditionUpdate) {
+        res.status(HttpStatus.BAD_REQUEST).send('');
+      }
+
+      return this.userService.update(Number(id), conditionUpdate);
     } catch (error: unknown) {
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error);
       throw new Error(error as string);
