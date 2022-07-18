@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
+
 import { User } from './user.entity';
+import { hashPassword } from '../../helpers';
+import { IUserSend } from './user.interface';
+import { RegisterDto } from './dto';
 
 @Injectable()
 export class UserService {
@@ -9,6 +13,11 @@ export class UserService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
   ) {}
+
+  mappingFromUserRepository(user: User): IUserSend {
+    const { password, ...rest } = user;
+    return rest;
+  }
 
   findAll(): Promise<User[]> {
     return this.usersRepository.find();
@@ -18,8 +27,32 @@ export class UserService {
     return this.usersRepository.findOneBy({ id });
   }
 
-  create(user: User): Promise<User> {
-    return this.usersRepository.save(user);
+  async create(user: RegisterDto): Promise<IUserSend | boolean> {
+    try {
+      const account: User = await this.usersRepository.findOneBy({
+        email: user.email,
+      });
+
+      if (account) {
+        return false;
+      }
+
+      const passwordHash: string = await hashPassword(user.password);
+      const userHash: RegisterDto = {
+        ...user,
+        password: passwordHash,
+      };
+
+      const userCreate: User = await this.usersRepository.save(userHash);
+
+      if (userCreate) {
+        return this.mappingFromUserRepository(userCreate);
+      }
+
+      return false;
+    } catch (error: unknown) {
+      throw new Error(error as string);
+    }
   }
 
   update(id: number, user: User): Promise<UpdateResult> {
