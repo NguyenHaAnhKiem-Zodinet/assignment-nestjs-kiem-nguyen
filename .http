@@ -10,8 +10,8 @@ Content-Type: application/json
 
 {
   "name": "Kiem",
-  "username": "string",
-  "email": "nguyenhaanhkiem12345@gmail.com",
+  "username": "Anhm0@",
+  "email": "nguyenhaanhkiem1234567@gmail.com",
   "birthday": "2022-07-18T07:21:30.000Z",
   "password": "string"
 }
@@ -21,21 +21,19 @@ POST http://localhost:3000/api/v1/users/login
 Content-Type: application/json
 
 {
-  "email": "nguyenhaanhkiem12345@gmail.com",
+  "email": "nguyenhaanhkiem1234567@gmail.com",
   "password": "string"
 }
 
 ###
-PUT http://localhost:3000/api/v1/users/1
+PUT http://localhost:3000/api/v1/users/
 Content-Type: application/json
 
 {
-    "name": "Kiem",
-    "username": "string",
-    "email": "nguyenhaanhkiem12345@gmail.com",
-    "birthday": "2022-07-18T07:21:30.000Z",
-    "password": "string"
+    "uuid": "48841276-024f-4e4d-8061-3319b0a0d523",
+    "name": "Kiem123",
+    "birthday": "2022-07-18T07:21:30.000Z"
 }
 
 ###
-DELETE http://localhost:3000/api/v1/users/3
+DELETE http://localhost:3000/api/v1/users/99f2d4ee-d271-4a8f-98f2-65f7843281f9

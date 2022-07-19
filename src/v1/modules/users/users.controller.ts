@@ -12,8 +12,8 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 
-import { UserService } from './user.service';
-import { User, UserNotPassword } from './user.entity';
+import { UserService } from './services/user.service';
+import { UserNotPassword } from './user.entity';
 import { RegisterDto, DeleteUserDto, LoginDto, UpdateDto, getUserByIDDto } from './dto';
 import { IUserSend } from './user.interface';
 
@@ -22,7 +22,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('/api/v1/users')
-  async getAllUsers(): Promise<User[]> {
+  async getAllUsers(): Promise<UserNotPassword[]> {
     try {
       return await this.userService.findAll();
     } catch (error: unknown) {
@@ -31,18 +31,24 @@ export class UserController {
   }
 
   @Get('/api/v1/users/:uuid')
-  async getUser(@Param() params: getUserByIDDto): Promise<UserNotPassword> {
+  async getUser(@Param() params: getUserByIDDto): Promise<UserNotPassword | null> {
     try {
-      return await this.userService.findOne(params.uuid);
+      const user: UserNotPassword | null = await this.userService.findOne(params.uuid);
+
+      if (!user) {
+        throw new HttpException('Account does not exist', HttpStatus.NO_CONTENT);
+      }
+
+      return user;
     } catch (error: unknown) {
       throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
   @Post('/api/v1/users/register')
-  async register(@Body() user: RegisterDto): Promise<IUserSend | boolean> {
+  async register(@Body() conditionRegister: RegisterDto): Promise<IUserSend | boolean> {
     try {
-      const registerUser: IUserSend | boolean = await this.userService.create(user);
+      const registerUser: IUserSend | boolean = await this.userService.create(conditionRegister);
 
       if (!registerUser) {
         throw new HttpException('Account already exists', HttpStatus.NO_CONTENT);
@@ -55,53 +61,44 @@ export class UserController {
   }
 
   @Post('/api/v1/users/login')
-  async login(
-    @Body() conditionLogin: LoginDto,
-    @Res() res: Response,
-  ): Promise<IUserSend | boolean> {
+  async login(@Body() conditionLogin: LoginDto): Promise<string | boolean> {
     try {
-      if (!conditionLogin.email || !conditionLogin.password) {
-        res.status(HttpStatus.BAD_REQUEST).send('Bad Request');
-        return;
-      }
-
       const jwt: string | null | boolean = await this.userService.login(
         conditionLogin.email,
         conditionLogin.password,
       );
 
       if (!jwt) {
-        res.status(HttpStatus.NO_CONTENT).send('Incorrect account or password');
-        return;
+        throw new HttpException('Incorrect account or password', HttpStatus.NO_CONTENT);
       }
 
-      res.status(HttpStatus.OK).send(jwt);
+      return jwt;
     } catch (error: unknown) {
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error);
-      throw new Error(error as string);
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  @Put('/api/v1/users/:id')
-  async updateUser(
-    @Body() conditionUpdate: UpdateDto,
-    @Res() res: Response,
-    @Param() id: string,
-  ): Promise<any> {
+  @Put('/api/v1/users')
+  async updateUser(@Body() conditionUpdate: UpdateDto): Promise<any> {
     try {
-      if (!id || !conditionUpdate) {
-        res.status(HttpStatus.BAD_REQUEST).send('');
-      }
-
-      return this.userService.update(Number(id), conditionUpdate);
+      return this.userService.update(conditionUpdate);
     } catch (error: unknown) {
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error);
-      throw new Error(error as string);
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  @Delete('/api/v1/users/:id')
-  async deleteUser(@Param() { uuid }: DeleteUserDto): Promise<number> {
-    return this.userService.remove(uuid);
+  @Delete('/api/v1/users/:uuid')
+  async deleteUser(@Param() { uuid }: DeleteUserDto): Promise<string | boolean> {
+    try {
+      const isDelete = await this.userService.remove(uuid);
+
+      if (!isDelete) {
+        throw new HttpException('Account does not exist', HttpStatus.NO_CONTENT);
+      }
+
+      return isDelete;
+    } catch (error: unknown) {
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }

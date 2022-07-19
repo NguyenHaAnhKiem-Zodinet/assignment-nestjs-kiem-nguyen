@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DeleteResult } from 'typeorm';
 import { Mapper } from '@automapper/core';
 import { InjectMapper } from '@automapper/nestjs';
 
-import { User, UserNotPassword } from './user.entity';
-import { hashPassword, comparePassword, createJwtToken } from '../../helpers';
-import { IUserSend } from './user.interface';
-import { RegisterDto, UpdateDto } from './dto';
+import { User, UserNotPassword } from '../user.entity';
+import { comparePassword, createJwtToken } from '../../../helpers';
+import { RegisterDto, UpdateDto } from '../dto';
 
 @Injectable()
 export class UserService {
@@ -17,15 +16,11 @@ export class UserService {
     @InjectMapper() private mapper: Mapper,
   ) {}
 
-  mappingFromUserRepository(user: User): IUserSend {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...rest } = user;
-    return rest;
-  }
-
-  findAll(): Promise<User[]> {
+  async findAll(): Promise<UserNotPassword[]> {
     try {
-      return this.usersRepository.find();
+      const listUsers: User[] = await this.usersRepository.find();
+
+      return this.mapper.mapArray(listUsers, User, UserNotPassword);
     } catch (error: unknown) {
       throw new Error(error as string);
     }
@@ -41,7 +36,7 @@ export class UserService {
     }
   }
 
-  async create(user: RegisterDto): Promise<IUserSend | boolean> {
+  async create(user: RegisterDto): Promise<UserNotPassword | boolean> {
     try {
       const account: User = await this.usersRepository.findOneBy({
         email: user.email,
@@ -51,16 +46,11 @@ export class UserService {
         return false;
       }
 
-      const passwordHash: string = await hashPassword(user.password);
-      const userHash: RegisterDto = {
-        ...user,
-        password: passwordHash,
-      };
-      const userEntity = this.usersRepository.create({ ...userHash });
+      const userEntity = this.usersRepository.create(user);
       const userCreate: User = await this.usersRepository.save(userEntity);
 
       if (userCreate) {
-        return this.mappingFromUserRepository(userCreate);
+        return this.mapper.map(userCreate, User, UserNotPassword);
       }
 
       return false;
@@ -85,28 +75,36 @@ export class UserService {
         return false;
       }
 
-      const userMap = this.mappingFromUserRepository(user);
+      const userMap = this.mapper.map(user, User, UserNotPassword);
       return createJwtToken(userMap);
     } catch (error: unknown) {
       throw new Error(error as string);
     }
   }
 
-  async update(id: number, user: UpdateDto): Promise<IUserSend> {
+  async update(user: UpdateDto): Promise<UserNotPassword> {
     try {
       const userChange: User = await this.usersRepository.save({
-        id,
         ...user,
       });
 
-      return this.mappingFromUserRepository(userChange);
+      return this.mapper.map(userChange, User, UserNotPassword);
     } catch (error: unknown) {
       throw new Error(error as string);
     }
   }
 
-  async remove(id: number): Promise<number> {
-    await this.usersRepository.delete(id);
-    return id;
+  async remove(uuid: string): Promise<string | boolean> {
+    try {
+      const isDelete: DeleteResult = await this.usersRepository.delete(uuid);
+
+      if (isDelete.affected > 0) {
+        return uuid;
+      }
+
+      return false;
+    } catch (error: unknown) {
+      throw new Error(error as string);
+    }
   }
 }
