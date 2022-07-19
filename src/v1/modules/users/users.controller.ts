@@ -8,55 +8,53 @@ import {
   Delete,
   Res,
   HttpStatus,
+  HttpException,
 } from '@nestjs/common';
 import { Response } from 'express';
 
 import { UserService } from './user.service';
-import { User } from './user.entity';
-import { RegisterDto, DeleteUserDto, LoginDto, UpdateDto } from './user.dto';
+import { User, UserNotPassword } from './user.entity';
+import { RegisterDto, DeleteUserDto, LoginDto, UpdateDto, getUserByIDDto } from './dto';
 import { IUserSend } from './user.interface';
 
 @Controller()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get()
+  @Get('/api/v1/users')
   async getAllUsers(): Promise<User[]> {
-    return await this.userService.findAll();
-  }
-
-  @Get('/:id')
-  async getUser(@Param() params): Promise<User> {
-    return await this.userService.findOne(params.id);
-  }
-
-  @Post('/register')
-  async register(
-    @Body() user: RegisterDto,
-    @Res() res: Response,
-  ): Promise<IUserSend | boolean> {
     try {
-      if (!user) {
-        res.status(HttpStatus.BAD_REQUEST).send('');
-      }
-
-      const registerUser: IUserSend | boolean = await this.userService.create(
-        user,
-      );
-
-      if (!registerUser) {
-        res.status(HttpStatus.NO_CONTENT).send('Account already exists');
-        return;
-      }
-
-      res.status(HttpStatus.OK).send(registerUser);
+      return await this.userService.findAll();
     } catch (error: unknown) {
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error);
-      throw new Error(error as string);
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  @Post('/login')
+  @Get('/api/v1/users/:uuid')
+  async getUser(@Param() params: getUserByIDDto): Promise<UserNotPassword> {
+    try {
+      return await this.userService.findOne(params.uuid);
+    } catch (error: unknown) {
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Post('/api/v1/users/register')
+  async register(@Body() user: RegisterDto): Promise<IUserSend | boolean> {
+    try {
+      const registerUser: IUserSend | boolean = await this.userService.create(user);
+
+      if (!registerUser) {
+        throw new HttpException('Account already exists', HttpStatus.NO_CONTENT);
+      }
+
+      return registerUser;
+    } catch (error: unknown) {
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Post('/api/v1/users/login')
   async login(
     @Body() conditionLogin: LoginDto,
     @Res() res: Response,
@@ -84,7 +82,7 @@ export class UserController {
     }
   }
 
-  @Put('/:id')
+  @Put('/api/v1/users/:id')
   async updateUser(
     @Body() conditionUpdate: UpdateDto,
     @Res() res: Response,
@@ -102,8 +100,8 @@ export class UserController {
     }
   }
 
-  @Delete('/:id')
-  async deleteUser(@Param() { id }: DeleteUserDto): Promise<number> {
-    return this.userService.remove(id);
+  @Delete('/api/v1/users/:id')
+  async deleteUser(@Param() { uuid }: DeleteUserDto): Promise<number> {
+    return this.userService.remove(uuid);
   }
 }

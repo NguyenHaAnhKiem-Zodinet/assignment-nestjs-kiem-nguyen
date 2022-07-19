@@ -1,5 +1,11 @@
 ###
-POST http://localhost:3000/register
+GET http://localhost:3000/api/v1/users/
+
+###
+GET http://localhost:3000/api/v1/users/81bde422-0a55-4ef8-8b96-22bb8a839b5f
+
+###
+POST http://localhost:3000/api/v1/users/register
 Content-Type: application/json
 
 {
@@ -11,25 +17,25 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:3000/login
+POST http://localhost:3000/api/v1/users/login
 Content-Type: application/json
 
 {
   "email": "nguyenhaanhkiem12345@gmail.com",
-  "password": "string1"
+  "password": "string"
 }
 
 ###
-PUT http://localhost:3000/1
+PUT http://localhost:3000/api/v1/users/1
 Content-Type: application/json
 
 {
-    "name": "Anh Kiem",
-    "birthday": "2022-07-18T07:21:30.000Z"
+    "name": "Kiem",
+    "username": "string",
+    "email": "nguyenhaanhkiem12345@gmail.com",
+    "birthday": "2022-07-18T07:21:30.000Z",
+    "password": "string"
 }
 
 ###
-DELETE http://localhost:3000/3
-
-###
-GET http://localhost:3000/
+DELETE http://localhost:3000/api/v1/users/3

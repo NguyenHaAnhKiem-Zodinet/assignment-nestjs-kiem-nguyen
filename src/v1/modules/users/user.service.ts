@@ -1,30 +1,44 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, UpdateResult } from 'typeorm';
+import { Repository } from 'typeorm';
+import { Mapper } from '@automapper/core';
+import { InjectMapper } from '@automapper/nestjs';
 
-import { User } from './user.entity';
+import { User, UserNotPassword } from './user.entity';
 import { hashPassword, comparePassword, createJwtToken } from '../../helpers';
 import { IUserSend } from './user.interface';
-import { RegisterDto, UpdateDto } from './user.dto';
+import { RegisterDto, UpdateDto } from './dto';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectMapper() private mapper: Mapper,
   ) {}
 
   mappingFromUserRepository(user: User): IUserSend {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...rest } = user;
     return rest;
   }
 
   findAll(): Promise<User[]> {
-    return this.usersRepository.find();
+    try {
+      return this.usersRepository.find();
+    } catch (error: unknown) {
+      throw new Error(error as string);
+    }
   }
 
-  findOne(id: number): Promise<User> {
-    return this.usersRepository.findOneBy({ id });
+  async findOne(uuid: string): Promise<UserNotPassword | null> {
+    try {
+      const user = await this.usersRepository.findOneBy({ uuid });
+
+      return this.mapper.map(user, User, UserNotPassword) ?? null;
+    } catch (error: unknown) {
+      throw new Error(error as string);
+    }
   }
 
   async create(user: RegisterDto): Promise<IUserSend | boolean> {
@@ -42,8 +56,8 @@ export class UserService {
         ...user,
         password: passwordHash,
       };
-
-      const userCreate: User = await this.usersRepository.save(userHash);
+      const userEntity = this.usersRepository.create({ ...userHash });
+      const userCreate: User = await this.usersRepository.save(userEntity);
 
       if (userCreate) {
         return this.mappingFromUserRepository(userCreate);
@@ -55,10 +69,7 @@ export class UserService {
     }
   }
 
-  async login(
-    email: string,
-    password: string,
-  ): Promise<string | null | boolean> {
+  async login(email: string, password: string): Promise<string | null | boolean> {
     try {
       const user: User = await this.usersRepository.findOneBy({
         email,
@@ -81,9 +92,14 @@ export class UserService {
     }
   }
 
-  update(id: number, user: UpdateDto): Promise<UpdateResult> {
+  async update(id: number, user: UpdateDto): Promise<IUserSend> {
     try {
-      return this.usersRepository.update(id, user);
+      const userChange: User = await this.usersRepository.save({
+        id,
+        ...user,
+      });
+
+      return this.mappingFromUserRepository(userChange);
     } catch (error: unknown) {
       throw new Error(error as string);
     }

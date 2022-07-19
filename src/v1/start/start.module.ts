@@ -3,6 +3,8 @@ import { IndexModule } from '../modules/index.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { User } from '../modules/users/user.entity';
+import { AutomapperModule } from '@automapper/nestjs';
+import { classes } from '@automapper/classes';
 
 @Module({
   imports: [
@@ -19,6 +21,9 @@ import { User } from '../modules/users/user.entity';
       database: process.env.MYSQL_DATABASE,
       entities: [User],
       synchronize: true,
+    }),
+    AutomapperModule.forRoot({
+      strategyInitializer: classes(),
     }),
   ],
 })
