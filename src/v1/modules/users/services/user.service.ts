@@ -6,7 +6,7 @@ import { InjectMapper } from '@automapper/nestjs';
 
 import { User, UserNotPassword } from '../user.entity';
 import { comparePassword, createJwtToken } from '../../../helpers';
-import { RegisterDto, UpdateDto } from '../dto';
+import { ChangePasswordDto, RegisterDto, UpdateDto } from '../dto';
 
 @Injectable()
 export class UserService {
@@ -82,9 +82,15 @@ export class UserService {
     }
   }
 
-  async update(user: UpdateDto): Promise<UserNotPassword> {
+  async update(user: UpdateDto): Promise<UserNotPassword | null> {
     try {
-      const userChange: User = await this.usersRepository.save({
+      const userNow: User = await this.usersRepository.findOneBy({ uuid: user.uuid });
+
+      if (!userNow) {
+        return null;
+      }
+
+      const userChange = await this.usersRepository.save({
         ...user,
       });
 
@@ -103,6 +109,30 @@ export class UserService {
       }
 
       return false;
+    } catch (error: unknown) {
+      throw new Error(error as string);
+    }
+  }
+
+  async changePassword(user: ChangePasswordDto): Promise<UserNotPassword | null | boolean> {
+    try {
+      const userNow: User = await this.usersRepository.findOneBy({ uuid: user.uuid });
+
+      if (!userNow) {
+        return null;
+      }
+
+      const isCheckPassword = await comparePassword(user.passwordOld, userNow.password);
+
+      if (!isCheckPassword) {
+        return false;
+      }
+
+      const userChange: User = await this.usersRepository.save({
+        ...user,
+      });
+
+      return this.mapper.map(userChange, User, UserNotPassword);
     } catch (error: unknown) {
       throw new Error(error as string);
     }

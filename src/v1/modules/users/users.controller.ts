@@ -10,12 +10,16 @@ import {
   HttpStatus,
   HttpException,
 } from '@nestjs/common';
-import { Response } from 'express';
-
-import { UserService } from './services/user.service';
 import { UserNotPassword } from './user.entity';
-import { RegisterDto, DeleteUserDto, LoginDto, UpdateDto, getUserByIDDto } from './dto';
-import { IUserSend } from './user.interface';
+import {
+  RegisterDto,
+  DeleteUserDto,
+  LoginDto,
+  UpdateDto,
+  getUserByIDDto,
+  ChangePasswordDto,
+} from './dto';
+import { UserService } from './services/user.service';
 
 @Controller()
 export class UserController {
@@ -46,9 +50,11 @@ export class UserController {
   }
 
   @Post('/api/v1/users/register')
-  async register(@Body() conditionRegister: RegisterDto): Promise<IUserSend | boolean> {
+  async register(@Body() conditionRegister: RegisterDto): Promise<UserNotPassword | boolean> {
     try {
-      const registerUser: IUserSend | boolean = await this.userService.create(conditionRegister);
+      const registerUser: UserNotPassword | boolean = await this.userService.create(
+        conditionRegister,
+      );
 
       if (!registerUser) {
         throw new HttpException('Account already exists', HttpStatus.NO_CONTENT);
@@ -79,9 +85,33 @@ export class UserController {
   }
 
   @Put('/api/v1/users')
-  async updateUser(@Body() conditionUpdate: UpdateDto): Promise<any> {
+  async updateUser(@Body() conditionUpdate: UpdateDto): Promise<UserNotPassword | null> {
     try {
-      return this.userService.update(conditionUpdate);
+      const userChange = await this.userService.update(conditionUpdate);
+
+      if (!userChange) {
+        throw new HttpException('Account does not exist', HttpStatus.NO_CONTENT);
+      }
+
+      return userChange;
+    } catch (error: unknown) {
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Put('/api/v1/users/change-password')
+  async changePassword(
+    @Body() conditionChangePassword: ChangePasswordDto,
+  ): Promise<UserNotPassword | null | boolean> {
+    try {
+      const isChangePassword: UserNotPassword | null | boolean =
+        await this.userService.changePassword(conditionChangePassword);
+
+      if (!isChangePassword) {
+        throw new HttpException('Account does not exist', HttpStatus.NO_CONTENT);
+      }
+
+      return isChangePassword;
     } catch (error: unknown) {
       throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
