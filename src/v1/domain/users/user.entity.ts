@@ -1,10 +1,21 @@
-import { hashPassword } from './../../helpers/hashPassword';
-import { Entity, Column, PrimaryColumn, Unique, BeforeInsert, Generated } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryColumn,
+  Unique,
+  BeforeInsert,
+  Generated,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { AutoMap } from '@automapper/classes';
+import { Authentication } from './services/authentication.service';
 
 @Unique('users', ['uuid', 'email'])
 @Entity()
 export class User {
+  constructor(private readonly authentication: Authentication) {}
+
   @PrimaryColumn()
   @Generated('uuid')
   @AutoMap()
@@ -12,7 +23,6 @@ export class User {
 
   @Column({
     length: 20,
-    default: true,
     nullable: true,
   })
   @AutoMap()
@@ -20,7 +30,6 @@ export class User {
 
   @Column({
     length: 8,
-    default: true,
     nullable: true,
   })
   @AutoMap()
@@ -28,7 +37,6 @@ export class User {
 
   @Column({
     unique: true,
-    default: true,
     nullable: true,
   })
   @AutoMap()
@@ -41,15 +49,24 @@ export class User {
   birthday: Date;
 
   @Column({
-    default: true,
     nullable: true,
   })
   @AutoMap()
   password: string;
 
+  @Column({ default: 'user' })
+  @AutoMap()
+  roles: string;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
+
   @BeforeInsert()
   async hashPassword() {
-    this.password = await hashPassword(this.password);
+    this.password = await this.authentication.hashPassword(this.password);
   }
 }
 
@@ -68,4 +85,7 @@ export class UserNotPassword {
 
   @AutoMap()
   birthday: Date;
+
+  @AutoMap()
+  roles: string;
 }

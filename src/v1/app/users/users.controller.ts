@@ -6,11 +6,13 @@ import {
   Body,
   Put,
   Delete,
-  Res,
   HttpStatus,
   HttpException,
+  UseGuards,
+  Request,
+  Query,
 } from '@nestjs/common';
-import { UserNotPassword } from './user.entity';
+import { UserNotPassword } from '../../domain/users/user.entity';
 import {
   RegisterDto,
   DeleteUserDto,
@@ -18,16 +20,24 @@ import {
   UpdateDto,
   getUserByIDDto,
   ChangePasswordDto,
-} from './dto';
-import { UserService } from './services/user.service';
+  GetAllUserDto,
+} from '../../domain/users/dto';
+import { UserService } from '../../domain/users/services/user.service';
+import { JwtAuthGuard } from '../../infrastructure/guards/auth.guard';
+import { RolesGuard } from '../../infrastructure/guards/role.guard';
+import { Roles } from './../../infrastructure/decorators/roles.decorator';
 
 @Controller()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('/api/v1/users')
-  async getAllUsers(): Promise<UserNotPassword[]> {
+  async getAllUsers(@Query() query?: GetAllUserDto): Promise<UserNotPassword[]> {
     try {
+      if (query) {
+        return await this.userService.findAll(query);
+      }
+
       return await this.userService.findAll();
     } catch (error: unknown) {
       throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -84,6 +94,7 @@ export class UserController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Put('/api/v1/users')
   async updateUser(@Body() conditionUpdate: UpdateDto): Promise<UserNotPassword | null> {
     try {
@@ -99,6 +110,8 @@ export class UserController {
     }
   }
 
+  @Roles('admin')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Put('/api/v1/users/change-password')
   async changePassword(
     @Body() conditionChangePassword: ChangePasswordDto,
@@ -117,6 +130,7 @@ export class UserController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete('/api/v1/users/:uuid')
   async deleteUser(@Param() { uuid }: DeleteUserDto): Promise<string | boolean> {
     try {

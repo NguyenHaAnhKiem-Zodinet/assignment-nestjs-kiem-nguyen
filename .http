@@ -1,5 +1,6 @@
 ###
-GET http://localhost:3000/api/v1/users/
+GET http://localhost:3000/api/v1/users?limit=10&page=0&email=zzzzz
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6InVzZXIiLCJiaXJ0aGRheSI6IjIwMjItMDctMThUMDc6MjE6MzAuMDAwWiIsImVtYWlsIjoibmd1eWVuaGFhbmhraWVtQGdtYWlsLmNvbSIsInVzZXJuYW1lIjoiQW5obTBAIiwibmFtZSI6IktpZW0iLCJ1dWlkIjoiOWU3NjRiMzEtODExMC00N2E1LWEwM2QtYjg3NmRhZWZiYjc5IiwiaWF0IjoxNjU4MjkwOTAxLCJleHAiOjE2NTgzMjA5MDF9.zWp3_02rOlqplypK6Yn-6p3cgCqgw8-AuENegdBLYzY
 
 ###
 GET http://localhost:3000/api/v1/users/81bde422-0a55-4ef8-8b96-22bb8a839b5f
@@ -21,7 +22,7 @@ POST http://localhost:3000/api/v1/users/login
 Content-Type: application/json
 
 {
-  "email": "nguyenhaanhkiem1234567@gmail.com",
+  "email": "nguyenhaanhkiem@gmail.com",
   "password": "string"
 }
 

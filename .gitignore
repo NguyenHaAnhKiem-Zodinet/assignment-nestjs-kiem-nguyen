@@ -1,6 +1,10 @@
 # compiled output
 /dist
 /node_modules
+/.vscode
+
+# test api
+*.http
 
 # Logs
 logs

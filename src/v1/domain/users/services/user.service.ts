@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DeleteResult } from 'typeorm';
+import { Repository, DeleteResult, Like } from 'typeorm';
 import { Mapper } from '@automapper/core';
 import { InjectMapper } from '@automapper/nestjs';
 
+import { Authentication } from './authentication.service';
 import { User, UserNotPassword } from '../user.entity';
-import { comparePassword, createJwtToken } from '../../../helpers';
-import { ChangePasswordDto, RegisterDto, UpdateDto } from '../dto';
+import { ChangePasswordDto, GetAllUserDto, RegisterDto, UpdateDto } from '../dto';
 
 @Injectable()
 export class UserService {
@@ -14,11 +14,27 @@ export class UserService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     @InjectMapper() private mapper: Mapper,
+    private readonly authentication: Authentication,
   ) {}
 
-  async findAll(): Promise<UserNotPassword[]> {
+  async findAll(query?: GetAllUserDto): Promise<UserNotPassword[]> {
     try {
-      const listUsers: User[] = await this.usersRepository.find();
+      const limit = query?.limit || 0;
+      const page = query?.page || 0;
+      const email = query?.email || '';
+      const username = query?.username || '';
+      const name = query?.name || '';
+
+      const [listUsers, count]: [User[], number] = await this.usersRepository.findAndCount({
+        where: {
+          email: Like(`%${email}%`),
+          username: Like(`%${username}%`),
+          name: Like(`%${name}%`),
+        },
+        order: { email: 'DESC' },
+        take: limit,
+        skip: page,
+      });
 
       return this.mapper.mapArray(listUsers, User, UserNotPassword);
     } catch (error: unknown) {
@@ -69,14 +85,14 @@ export class UserService {
         return null;
       }
 
-      const isCheckPassword = await comparePassword(password, user.password);
+      const isCheckPassword = await this.authentication.comparePassword(password, user.password);
 
       if (!isCheckPassword) {
         return false;
       }
 
       const userMap = this.mapper.map(user, User, UserNotPassword);
-      return createJwtToken(userMap);
+      return this.authentication.createJwtToken(userMap);
     } catch (error: unknown) {
       throw new Error(error as string);
     }
@@ -122,7 +138,10 @@ export class UserService {
         return null;
       }
 
-      const isCheckPassword = await comparePassword(user.passwordOld, userNow.password);
+      const isCheckPassword = await this.authentication.comparePassword(
+        user.passwordOld,
+        userNow.password,
+      );
 
       if (!isCheckPassword) {
         return false;
