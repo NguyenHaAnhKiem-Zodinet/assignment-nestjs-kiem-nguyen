@@ -72,11 +72,6 @@ export class User {
 
   @UpdateDateColumn()
   updated_at: Date;
-
-  @BeforeInsert()
-  async hashPassword() {
-    this.password = await this.authentication.hashPassword(this.password);
-  }
 }
 
 export class UserNotPassword {

@@ -1,18 +1,18 @@
 ###
-GET http://localhost:3000/api/v1/users?limit=10&page=0&email=zzzzz
+GET http://localhost:3000/api/v1/users?limit=10&page=0
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6InVzZXIiLCJiaXJ0aGRheSI6IjIwMjItMDctMThUMDc6MjE6MzAuMDAwWiIsImVtYWlsIjoibmd1eWVuaGFhbmhraWVtQGdtYWlsLmNvbSIsInVzZXJuYW1lIjoiQW5obTBAIiwibmFtZSI6IktpZW0iLCJ1dWlkIjoiOWU3NjRiMzEtODExMC00N2E1LWEwM2QtYjg3NmRhZWZiYjc5IiwiaWF0IjoxNjU4MjkwOTAxLCJleHAiOjE2NTgzMjA5MDF9.zWp3_02rOlqplypK6Yn-6p3cgCqgw8-AuENegdBLYzY
 
 ###
 GET http://localhost:3000/api/v1/users/81bde422-0a55-4ef8-8b96-22bb8a839b5f
 
 ###
-POST http://localhost:3000/api/v1/users/register
+POST http://localhost:3000/api/v1/users/register/
 Content-Type: application/json
 
 {
   "name": "Kiem",
   "username": "Anhm0@",
-  "email": "nguyenhaanhkiem@gmail.com",
+  "email": "satthuid@gmail.com",
   "birthday": "2022-07-18T07:21:30.000Z",
   "password": "string"
 }

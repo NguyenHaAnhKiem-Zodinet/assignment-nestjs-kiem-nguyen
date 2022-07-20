@@ -6,7 +6,7 @@ import { InjectMapper } from '@automapper/nestjs';
 
 import { Authentication } from './authentication.service';
 import { User, UserNotPassword } from '../user.entity';
-import { ChangePasswordDto, GetAllUserDto, RegisterDto, UpdateDto } from '../dto';
+import { BlockUserDto, ChangePasswordDto, GetAllUserDto, RegisterDto, UpdateDto } from '../dto';
 
 @Injectable()
 export class UserService {
@@ -62,8 +62,8 @@ export class UserService {
         return false;
       }
 
-      const userEntity = this.usersRepository.create(user);
-      const userCreate: User = await this.usersRepository.save(userEntity);
+      const hashPassword = await this.authentication.hashPassword(user.password);
+      const userCreate: User = await this.usersRepository.save({ ...user, password: hashPassword });
 
       if (userCreate) {
         return this.mapper.map(userCreate, User, UserNotPassword);
@@ -98,7 +98,7 @@ export class UserService {
     }
   }
 
-  async update(user: UpdateDto): Promise<UserNotPassword | null> {
+  async update(user: UpdateDto | BlockUserDto): Promise<UserNotPassword | null> {
     try {
       const userNow: User = await this.usersRepository.findOneBy({ uuid: user.uuid });
 
@@ -106,7 +106,7 @@ export class UserService {
         return null;
       }
 
-      const userEntity = this.usersRepository.create({ ...userNow, ...user });
+      const userEntity = { ...userNow, ...user };
       const userChange = await this.usersRepository.save(userEntity);
 
       return this.mapper.map(userChange, User, UserNotPassword);
@@ -146,8 +146,11 @@ export class UserService {
         return false;
       }
 
-      const userEntity = this.usersRepository.create({ ...user });
-      const userChange: User = await this.usersRepository.save(userEntity);
+      const hashPassword = await this.authentication.hashPassword(user.passwordNew);
+      const userChange: User = await this.usersRepository.save({
+        ...userNow,
+        password: hashPassword,
+      });
 
       return this.mapper.map(userChange, User, UserNotPassword);
     } catch (error: unknown) {
