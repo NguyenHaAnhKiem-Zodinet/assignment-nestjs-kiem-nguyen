@@ -10,12 +10,12 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { UserNotPassword } from '../../domain/users/user.entity';
-import { ChangePasswordDto, DeleteUserDto, BlockUserDto } from '../../domain/users/dto';
-import { UserService } from '../../domain/users/services/user.service';
-import { JwtAuthGuard } from '../../infrastructure/guards/auth.guard';
-import { RolesGuard } from '../../infrastructure/guards/role.guard';
-import { Roles } from './../../infrastructure/decorators/roles.decorator';
+import { UserNotPassword } from '../../../domain/users/user.entity';
+import { ChangePasswordDto, DeleteUserDto, BlockUserDto } from '../../../domain/users/dto';
+import { UserService } from '../../../domain/users/services/user.service';
+import { JwtAuthGuard } from '../../../infrastructure/guards/auth.guard';
+import { RolesGuard } from '../../../infrastructure/guards/role.guard';
+import { Roles } from '../../../infrastructure/decorators/roles.decorator';
 
 @ApiTags('admin')
 @ApiBearerAuth()

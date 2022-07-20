@@ -18,11 +18,11 @@ import {
   getUserByIDDto,
   ChangePasswordDto,
   GetAllUserDto,
-} from '../../domain/users/dto';
+} from '../../../domain/users/dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { UserNotPassword } from '../../domain/users/user.entity';
-import { UserService } from '../../domain/users/services/user.service';
-import { JwtAuthGuard } from '../../infrastructure/guards/auth.guard';
+import { UserNotPassword } from '../../../domain/users/user.entity';
+import { UserService } from '../../../domain/users/services/user.service';
+import { JwtAuthGuard } from '../../../infrastructure/guards/auth.guard';
 
 @ApiTags('users')
 @Controller('/api/v1/users')

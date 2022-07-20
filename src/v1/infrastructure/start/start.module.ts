@@ -1,27 +1,23 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { classes } from '@automapper/classes';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AutomapperModule } from '@automapper/nestjs';
 
-import { User } from '../../domain/users/user.entity';
 import { UserModule } from 'src/v1/app/users/users.module';
+import databaseConfig from '../configs/databaseConfig';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      load: [databaseConfig],
       envFilePath: './src/v1/infrastructure/configs/.env',
     }),
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: process.env.MYSQL_HOST,
-      port: Number(process.env.MYSQL_PORT),
-      username: process.env.MYSQL_USER,
-      password: process.env.MYSQL_PASS,
-      database: process.env.MYSQL_DATABASE,
-      entities: [User],
-      synchronize: true,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (config: ConfigService) => config.get<TypeOrmModuleOptions>('database'),
+      inject: [ConfigService],
     }),
     AutomapperModule.forRoot({
       strategyInitializer: classes(),

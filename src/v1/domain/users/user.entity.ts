@@ -3,24 +3,16 @@ import {
   Column,
   PrimaryColumn,
   Unique,
-  BeforeInsert,
   Generated,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
-import { Authentication } from './services/authentication.service';
-
-export enum UserRole {
-  ADMIN = 'admin',
-  USER = 'user',
-}
+import { UserRole } from '../../infrastructure/types/userRole.enum';
 
 @Unique('users', ['uuid', 'email'])
 @Entity()
 export class User {
-  constructor(private readonly authentication: Authentication) {}
-
   @PrimaryColumn()
   @Generated('uuid')
   @AutoMap()
