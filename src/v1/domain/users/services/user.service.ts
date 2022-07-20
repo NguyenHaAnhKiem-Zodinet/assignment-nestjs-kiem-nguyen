@@ -106,9 +106,8 @@ export class UserService {
         return null;
       }
 
-      const userChange = await this.usersRepository.save({
-        ...user,
-      });
+      const userEntity = this.usersRepository.create({ ...userNow, ...user });
+      const userChange = await this.usersRepository.save(userEntity);
 
       return this.mapper.map(userChange, User, UserNotPassword);
     } catch (error: unknown) {
@@ -147,9 +146,8 @@ export class UserService {
         return false;
       }
 
-      const userChange: User = await this.usersRepository.save({
-        ...user,
-      });
+      const userEntity = this.usersRepository.create({ ...user });
+      const userChange: User = await this.usersRepository.save(userEntity);
 
       return this.mapper.map(userChange, User, UserNotPassword);
     } catch (error: unknown) {

@@ -29,9 +29,10 @@ Content-Type: application/json
 ###
 PUT http://localhost:3000/api/v1/users/
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc0Jsb2NrIjpmYWxzZSwicm9sZSI6InVzZXIiLCJiaXJ0aGRheSI6IjIwMjItMDctMThUMDc6MjE6MzAuMDAwWiIsImVtYWlsIjoibmd1eWVuaGFhbmhraWVtQGdtYWlsLmNvbSIsInVzZXJuYW1lIjoiQW5obTBAIiwibmFtZSI6IktpZW0iLCJ1dWlkIjoiOWU3NjRiMzEtODExMC00N2E1LWEwM2QtYjg3NmRhZWZiYjc5IiwiaWF0IjoxNjU4MzAyMTc4LCJleHAiOjE2NTgzMzIxNzh9.N6Zclf_2zMYmHtWJUA58JmwI8CKeMUAozdGo8nVQw1w
 
 {
-    "uuid": "81bde422-0a55-4ef8-8b96-22bb8a839b5f",
+    "uuid": "9e764b31-8110-47a5-a03d-b876daefbb79",
     "name": "Kiem12345",
     "birthday": "2022-07-18T07:21:30.000Z"
 }
@@ -47,4 +48,13 @@ Content-Type: application/json
     "uuid": "9e764b31-8110-47a5-a03d-b876daefbb79",
     "passwordOld": "string",
     "passwordNew": "123456"
+}
+
+###
+PUT http://localhost:3000/api/v1/admin/block
+Content-Type: application/json
+
+{
+  "uuid": "48841276-024f-4e4d-8061-3319b0a0d52",
+  "isBlock": false
 }

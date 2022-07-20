@@ -11,6 +11,11 @@ import {
 import { AutoMap } from '@automapper/classes';
 import { Authentication } from './services/authentication.service';
 
+export enum UserRole {
+  ADMIN = 'admin',
+  USER = 'user',
+}
+
 @Unique('users', ['uuid', 'email'])
 @Entity()
 export class User {
@@ -54,9 +59,13 @@ export class User {
   @AutoMap()
   password: string;
 
-  @Column({ default: 'user' })
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
   @AutoMap()
-  roles: string;
+  role: UserRole;
+
+  @Column({ type: 'boolean', default: false })
+  @AutoMap()
+  isBlock: boolean;
 
   @CreateDateColumn()
   created_at: Date;
@@ -87,5 +96,8 @@ export class UserNotPassword {
   birthday: Date;
 
   @AutoMap()
-  roles: string;
+  role: string;
+
+  @AutoMap()
+  isBlock: boolean;
 }

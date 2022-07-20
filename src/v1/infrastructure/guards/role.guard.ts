@@ -18,7 +18,7 @@ export class RolesGuard implements CanActivate {
       const request = context.switchToHttp().getRequest();
       const user: UserNotPassword = request.user;
 
-      return this.matchRoles(roles[0], user.roles);
+      return this.matchRoles(roles[0], user.role);
     } catch (error: unknown) {
       throw new Error(error as string);
     }
@@ -26,7 +26,6 @@ export class RolesGuard implements CanActivate {
 
   private matchRoles(roles: string, rolesCheck: string): boolean {
     try {
-      console.log(roles, rolesCheck);
       return roles === rolesCheck;
     } catch (error: unknown) {
       throw new Error(error as string);

@@ -1,4 +1,12 @@
-import { IsNotEmpty, IsString, MinLength, MaxLength, IsDate } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  MinLength,
+  MaxLength,
+  IsDate,
+  IsBoolean,
+  IsOptional,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class UpdateDto {
@@ -6,14 +14,18 @@ export class UpdateDto {
   @IsString()
   uuid: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @MinLength(3)
   @MaxLength(20)
   name: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @Type(() => Date)
   @IsDate()
   birthday: Date;
+
+  @IsOptional()
+  @IsBoolean()
+  isBlock: boolean;
 }

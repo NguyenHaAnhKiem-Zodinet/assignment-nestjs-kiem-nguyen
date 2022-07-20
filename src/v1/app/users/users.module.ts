@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassportModule } from '@nestjs/passport';
 
 import { UserController } from './users.controller';
+import { AdminController } from './admin.controller';
 import { UserService } from '../../domain/users/services/user.service';
 import { UserMapper } from '../../domain/users/services/mapper.service';
 import { Authentication } from '../../domain/users/services/authentication.service';
@@ -23,7 +24,7 @@ import { User } from '../../domain/users/user.entity';
       signOptions: { expiresIn: process.env.TIMERESET },
     }),
   ],
-  controllers: [UserController],
+  controllers: [UserController, AdminController],
   providers: [UserService, UserMapper, Authentication, JwtStrategy],
 })
 export class UserModule {}
