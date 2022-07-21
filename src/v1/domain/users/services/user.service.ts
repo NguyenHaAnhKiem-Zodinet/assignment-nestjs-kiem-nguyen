@@ -75,7 +75,7 @@ export class UserService {
     }
   }
 
-  async login(email: string, password: string): Promise<string | null | boolean> {
+  async login(email: string, password: string, captcha: string): Promise<string | null | boolean> {
     try {
       const user: User = await this.usersRepository.findOneBy({
         email,

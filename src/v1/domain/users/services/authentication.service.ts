@@ -1,4 +1,5 @@
 import * as bcrypt from 'bcrypt';
+import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
@@ -6,11 +7,14 @@ import { UserNotPassword } from '../user.entity';
 
 @Injectable()
 export class Authentication {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(private readonly jwtService: JwtService, private readonly config: ConfigService) {}
 
   async hashPassword(password: string): Promise<string> {
     try {
-      const passwordHash: string = await bcrypt.hashSync(password, Number(process.env.ROUNDS));
+      const passwordHash: string = await bcrypt.hashSync(
+        password,
+        Number(this.config.get('ROUNDS')),
+      );
 
       return passwordHash;
     } catch (error: unknown) {

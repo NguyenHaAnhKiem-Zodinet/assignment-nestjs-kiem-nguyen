@@ -20,6 +20,7 @@ import {
   GetAllUserDto,
 } from '../../../domain/users/dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { GoogleRecaptchaGuard } from '@nestlab/google-recaptcha';
 import { UserNotPassword } from '../../../domain/users/user.entity';
 import { UserService } from '../../../domain/users/services/user.service';
 import { JwtAuthGuard } from '../../../infrastructure/guards/auth.guard';
@@ -92,12 +93,14 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'Logged in successfully' })
   @ApiResponse({ status: 204, description: 'Incorrect account or password' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
+  @UseGuards(GoogleRecaptchaGuard)
   @Post('/login')
   async login(@Body() conditionLogin: LoginDto): Promise<string | boolean> {
     try {
       const jwt: string | null | boolean = await this.userService.login(
         conditionLogin.email,
         conditionLogin.password,
+        conditionLogin.captcha,
       );
 
       if (!jwt) {

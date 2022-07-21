@@ -16,4 +16,11 @@ export class LoginDto {
   })
   @IsNotEmpty()
   password: string;
+
+  @ApiProperty({
+    example: 'string',
+    description: 'The captcha of the User',
+  })
+  @IsNotEmpty()
+  captcha: string;
 }
