@@ -19,12 +19,11 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "typeorm": "typeorm-ts-node-esm -d ormconfig.ts",
-		"migration:generate": "npm run typeorm -- migration:generate ./src/v1/infrastructure/migrations",
-		"migration:create": "npm run typeorm -- migration:create",
-		"migration:run": "npm run typeorm -- migration:run",
-		"migration:revert": "npm run typeorm -- migration:revert",
-    "schema:sync": "npm run typeorm -- schema:sync"
+    "typeorm": "typeorm-ts-node-commonjs -d ./src/v1/infrastructure/configs/databaseConfig.module.ts",
+    "migration:generate": "typeorm migration:generate ./src/v1/infrastructure/migrations/User",
+    "migration:create": "typeorm migration:create ./src/v1/infrastructure/migrations/User",
+    "migration:run": "typeorm migration:run",
+    "migration:revert": "typeorm migration:revert"
   },
   "dependencies": {
     "@automapper/classes": "^8.5.1",
