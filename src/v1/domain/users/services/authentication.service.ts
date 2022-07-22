@@ -32,7 +32,7 @@ export class Authentication {
     }
   }
 
-  createJwtToken(user: UserNotPassword) {
+  createJwtToken(user: UserNotPassword): string {
     try {
       return this.jwtService.sign({ ...user });
     } catch (error: unknown) {

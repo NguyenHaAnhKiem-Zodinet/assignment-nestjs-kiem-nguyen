@@ -18,12 +18,14 @@ import {
   getUserByIDDto,
   ChangePasswordDto,
   GetAllUserDto,
+  OtpDto,
 } from '../../../domain/users/dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GoogleRecaptchaGuard } from '@nestlab/google-recaptcha';
 import { UserNotPassword } from '../../../domain/users/user.entity';
 import { UserService } from '../../../domain/users/services/user.service';
 import { JwtAuthGuard } from '../../../infrastructure/guards/auth.guard';
+import { OtpGuard } from 'src/v1/infrastructure/guards/otp.guard';
 
 @ApiTags('users')
 @Controller('/api/v1/users')
@@ -108,6 +110,20 @@ export class UserController {
       }
 
       return jwt;
+    } catch (error: unknown) {
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @ApiOperation({ summary: 'Check OTP' })
+  @ApiResponse({ status: 200, description: 'OTP is correct' })
+  @ApiResponse({ status: 403, description: 'Wrong OTP' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error' })
+  @UseGuards(OtpGuard)
+  @Post('/otp')
+  otp(@Body() conditionOtp: OtpDto): boolean {
+    try {
+      return true;
     } catch (error: unknown) {
       throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }

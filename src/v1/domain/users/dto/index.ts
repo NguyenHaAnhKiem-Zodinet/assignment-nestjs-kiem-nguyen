@@ -6,3 +6,4 @@ export * from './getUserByID.dto';
 export * from './changePassword.dto';
 export * from './getAllUser.dto';
 export * from './blockUser.dto';
+export * from './otp.dto';

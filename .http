@@ -1,12 +1,12 @@
 ###
-GET http://localhost:3000/api/v1/users?limit=10&page=0
+GET http://localhost:5000/api/v1/users?limit=10&page=0
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6InVzZXIiLCJiaXJ0aGRheSI6IjIwMjItMDctMThUMDc6MjE6MzAuMDAwWiIsImVtYWlsIjoibmd1eWVuaGFhbmhraWVtQGdtYWlsLmNvbSIsInVzZXJuYW1lIjoiQW5obTBAIiwibmFtZSI6IktpZW0iLCJ1dWlkIjoiOWU3NjRiMzEtODExMC00N2E1LWEwM2QtYjg3NmRhZWZiYjc5IiwiaWF0IjoxNjU4MjkwOTAxLCJleHAiOjE2NTgzMjA5MDF9.zWp3_02rOlqplypK6Yn-6p3cgCqgw8-AuENegdBLYzY
 
 ###
-GET http://localhost:3000/api/v1/users/81bde422-0a55-4ef8-8b96-22bb8a839b5f
+GET http://localhost:5000/api/v1/users/81bde422-0a55-4ef8-8b96-22bb8a839b5f
 
 ###
-POST http://localhost:3000/api/v1/users/register/
+POST http://localhost:5000/api/v1/users/register/
 Content-Type: application/json
 
 {
@@ -18,7 +18,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:3000/api/v1/users/login
+POST http://localhost:5000/api/v1/users/login
 Content-Type: application/json
 
 {
@@ -27,7 +27,7 @@ Content-Type: application/json
 }
 
 ###
-PUT http://localhost:3000/api/v1/users/
+PUT http://localhost:5000/api/v1/users/
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc0Jsb2NrIjpmYWxzZSwicm9sZSI6InVzZXIiLCJiaXJ0aGRheSI6IjIwMjItMDctMThUMDc6MjE6MzAuMDAwWiIsImVtYWlsIjoibmd1eWVuaGFhbmhraWVtQGdtYWlsLmNvbSIsInVzZXJuYW1lIjoiQW5obTBAIiwibmFtZSI6IktpZW0iLCJ1dWlkIjoiOWU3NjRiMzEtODExMC00N2E1LWEwM2QtYjg3NmRhZWZiYjc5IiwiaWF0IjoxNjU4MzAyMTc4LCJleHAiOjE2NTgzMzIxNzh9.N6Zclf_2zMYmHtWJUA58JmwI8CKeMUAozdGo8nVQw1w
 
@@ -38,10 +38,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc0Jsb2NrIjpmYWxzZ
 }
 
 ###
-DELETE http://localhost:3000/api/v1/users/99f2d4ee-d271-4a8f-98f2-65f7843281f9
+DELETE http://localhost:5000/api/v1/users/99f2d4ee-d271-4a8f-98f2-65f7843281f9
 
 ###
-PUT http://localhost:3000/api/v1/users/change-password
+PUT http://localhost:5000/api/v1/users/change-password
 Content-Type: application/json
 
 {
@@ -51,10 +51,18 @@ Content-Type: application/json
 }
 
 ###
-PUT http://localhost:3000/api/v1/admin/block
+PUT http://localhost:5000/api/v1/admin/block
 Content-Type: application/json
 
 {
   "uuid": "48841276-024f-4e4d-8061-3319b0a0d52",
   "isBlock": false
+}
+
+###
+POST http://localhost:5000/api/v1/users/otp
+Content-Type: application/json
+
+{
+  "otp": "123456"
 }
